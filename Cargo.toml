@@ -2,4 +2,4 @@
 members = [
     "libs/*",
 ]
-workspace.resolver = "2"
+resolver = "2"
