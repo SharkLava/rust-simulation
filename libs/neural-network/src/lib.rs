@@ -1,6 +1,6 @@
 use rand::Rng;
 use rand::RngCore;
-use rand_chacha::ChaCha8Rng;
+
 
 struct Neuron {
     bias: f32,
@@ -40,7 +40,7 @@ struct Layer {
     neurons: Vec<Neuron>,
 }
 impl Layer {
-    fn new(neurons: Vec<Neuron>) -> Self {
+    fn new(_neurons: Vec<Neuron>) -> Self {
         todo!()
     }
 
