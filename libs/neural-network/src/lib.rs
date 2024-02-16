@@ -1,6 +1,4 @@
-use rand::Rng;
-use rand::RngCore;
-
+use rand::{Rng, RngCore};
 
 struct Neuron {
     bias: f32,
@@ -93,20 +91,65 @@ impl Network {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     mod random {
         use super::*;
-        use rand::{random, SeedableRng};
+        use rand::SeedableRng;
         use rand_chacha::ChaCha8Rng;
 
         #[test]
         fn test() {
             let mut rng = ChaCha8Rng::from_seed(Default::default());
-            let neuron = Neuron::random(4, &mut rng);
 
-            assert_eq!(neuron.bias, -0.6255188);
-            assert_eq!(
-                neuron.weights,
-                &[0.67383957, 0.8181262, 0.26284897, 0.5238807,]
+            let network = Network::random(
+                &mut rng,
+                &[
+                    LayerTopology { neurons: 3 },
+                    LayerTopology { neurons: 2 },
+                    LayerTopology { neurons: 1 },
+                ],
+            );
+
+            assert_eq!(network.layers.len(), 2);
+            assert_eq!(network.layers[0].neurons.len(), 2);
+
+            approx::assert_relative_eq!(network.layers[0].neurons[0].bias, -0.6255188);
+
+            approx::assert_relative_eq!(
+                network.layers[0].neurons[0].weights.as_slice(),
+                &[0.67383957, 0.8181262, 0.26284897].as_slice()
+            );
+
+            approx::assert_relative_eq!(network.layers[0].neurons[1].bias, 0.5238807);
+
+            approx::assert_relative_eq!(
+                network.layers[0].neurons[1].weights.as_slice(),
+                &[-0.5351684, 0.069369555, -0.7648182].as_slice()
+            );
+
+            assert_eq!(network.layers[1].neurons.len(), 1);
+
+            approx::assert_relative_eq!(
+                network.layers[1].neurons[0].weights.as_slice(),
+                &[-0.48879623, -0.19277143].as_slice()
+            );
+        }
+    }
+
+    mod propogate {
+        use super::*;
+        use approx::assert_relative_eq;
+
+        #[test]
+        fn test() {
+            let neuron = Neuron {
+                bias: 0.5,
+                weights: vec![-0.3, 0.8],
+            };
+            assert_relative_eq!(neuron.propogate(&[-10.0, -10.0]).unwrap(), 0.0,);
+            assert_relative_eq!(
+                neuron.propogate(&[0.5, 1.0]).unwrap(),
+                (-0.3 * 0.5) + (0.8 * 1.0) + 0.5,
             );
         }
     }
